@@ -1,9 +1,6 @@
 # The Name column should be split into separate First Name and Last Name columns.
-
 # The DOB data should be re-written into DD/MM/YYYY format.
-
 # The SSN data should be re-written such that the first five numbers are hidden from view.
-
 # The State data should be re-written as simple two-letter abbreviations.
 # 214	Sarah Simpson	12/4/1985	282-01-8166	Florida
 
@@ -62,36 +59,22 @@ us_state_abbrev = {
 
 import os, csv
 
-path = os.path.join("..","..","Instructions","pyBoss","raw_data")
-fullFile = os.path.join(path,"employee_data2.csv")
-convertedFile = fullFile.replace(".csv","_converted.csv")
-# stateFilePath = os.path.join("..","us_state_abbrev.py")
+rawPath = os.path.join("raw_data")
+rawFile = "employee_data2.csv"
+fullFile = os.path.join(rawPath,rawFile)
+convertedFile = rawFile.replace(".csv","_converted.csv")
 
 with open(fullFile,'r') as inputFile, open(convertedFile,'w', newline='') as outputFile:
     columns = ["Emp ID","First Name","Last Name","DOB","SSN","State"]
     writer = csv.writer(outputFile, delimiter= ",")
     writer.writerow(columns)
     reader = csv.DictReader(inputFile, skipinitialspace = True, delimiter = ",")
-    #readerOfStates = csv.DictReader(StateFile)
-    # stateDic = StateFile.read().replace("us_state_abbrev = ","")
-    # stateDic = stateDic.replace("{","").replace("}","")
-    # StateAbbrev = stateDic.split(",")
-    # StateDic = {}
-    # for s in StateAbbrev:
-    #     # print(s)
-    #     s = s.split(":")
-    #     print(s)
-        # StateDic[s[0]] = s[1]
-    # print(stateDic) 
-    # for states in readerOfStates:
-    #     print(states.values())
-        #reader.next() #do i need to skip the header?
     for row in reader:
-        print(row)
         empid = row["Emp ID"]
+        # split full name into first and last
         fullName = row["Name"].split(" ")
+        #if there are full names with more than 2 names, put all but last name into first name
         if row["Name"].count(" ") > 1:
-            print(row["Name"])
             firstName = ""
             for x in range(len(fullName)-1):
                 firstName = firstName + " " + (fullName[x])
@@ -99,18 +82,20 @@ with open(fullFile,'r') as inputFile, open(convertedFile,'w', newline='') as out
         else:
             firstName = fullName[0]
             lastName = fullName[1]
-            # print(row["DOB"])
+        #  change format of date of birth
         DOB = row["DOB"].split("-")
         DOB = DOB[2]+"/"+DOB[1]+"/" + DOB[0]
+        #hide first 5 digits of SSN
         SSN = row["SSN"].split("-")
         SSN = "***-**-" + SSN[2]
+        # get state abbreviation
         StateAbbrev = us_state_abbrev[row["State"]]
         
-        
+        # put new row into a list
         line = [empid,firstName,lastName,DOB,SSN, StateAbbrev]
+        #write list to converted/final file
         writer.writerow(line)
-        # writer.writerow( ("id",firstName,lastName,"DOB","SSN", "State") )
-        # print("id" + firstName+ lastName+"DOB"+"SSN"+ "State")
+    print(rawFile + " has been converted and saved as " + convertedFile)
 
     
 
